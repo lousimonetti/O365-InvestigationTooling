@@ -1,16 +1,14 @@
-﻿#Import MSOline Module
- import-module MSOnline
- #Import Exchange Online Module
- Import-Module $((Get-ChildItem -Path $($env:LOCALAPPDATA + "\Apps\2.0\") -Filter Microsoft.Exchange.Management.ExoPowershellModule.dll -Recurse).FullName | ?{ $_ -notmatch "_none_" } | select -First 1)
-
+#Import MSOline Module
+import-module MSOnline
+#Import Exchange Online Module
+import-module ExchangeOnlineManagement
 
 #Set admin UPN
-$UPN = 'user@domain.com'
+$UPN = Read-Host "Enter Admin UPN"
 
 #This connects to Azure Active Directory & Exchange Online
 Connect-MsolService
-$EXOSession = New-ExoPSSession -UserPrincipalName $UPN
-Import-PSSession $EXOSession -AllowClobber
+Connect-ExchangeOnline -UserPrincipalName $UPN
 
 $startDate = (Get-Date).AddDays(-90).ToString('MM/dd/yyyy')
 $endDate = (Get-Date).ToString('MM/dd/yyyy')
@@ -26,4 +24,3 @@ $inactiveInLastThreeMonthsUsers = $allUsers.UserPrincipalName | where {$loggedOn
 
 Write-Output "The following users have no logged in for the last 90 days:"
 Write-Output $inactiveInLastThreeMonthsUsers
-
